@@ -36,4 +36,9 @@ class Meetup extends Model
     public function confirmedBookings(){
         return $this->hasMany(Booking::class)->where('status' , BookingStatus::Confirmed);
     }
+
+    public function organizedBy(User $user): bool
+    {
+        return $this->organizer_id === $user->id;
+    }
 }

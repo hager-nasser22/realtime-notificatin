@@ -12,7 +12,7 @@ class UpdateMeetupRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,8 +22,15 @@ class UpdateMeetupRequest extends FormRequest
      */
     public function rules(): array
     {
+        $meetup = $this->route('meetup');
+        $capacity = max(1, $meetup->confirmedBookings()->count());
         return [
-            //
+            'title'             => ['sometimes', 'string', 'max:255'],
+            'description'       => ['sometimes', 'nullable', 'string'],
+            'location'          => ['sometimes', 'string', 'max:255'],
+            'starts_at'         => ['sometimes', 'date', 'after:now'],
+            'capacity'          => ['sometimes', 'integer', "min:{$capacity}", 'max:10000'],
+            'requires_approval' => ['sometimes', 'boolean'],
         ];
     }
 }

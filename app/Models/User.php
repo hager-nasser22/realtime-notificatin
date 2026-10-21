@@ -29,13 +29,4 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
-    public function organizedMeetups()
-    {
-        return $this->hasMany(Meetup::class, 'organizer_id');
-    }
-
-    public function bookings()
-    {
-        return $this->hasMany(Booking::class);
-    }
 }

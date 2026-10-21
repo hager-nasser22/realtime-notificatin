@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\BookingStatus;
 use Illuminate\Database\Eloquent\Model;
 
 class Meetup extends Model
@@ -30,5 +31,9 @@ class Meetup extends Model
     public function attendees()
     {
         return $this->belongsToMany(User::class, 'bookings')->withTimestamps();
+    }
+
+    public function confirmedBookings(){
+        return $this->hasMany(Booking::class)->where('status' , BookingStatus::Confirmed);
     }
 }

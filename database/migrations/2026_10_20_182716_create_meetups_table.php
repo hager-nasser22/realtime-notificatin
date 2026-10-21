@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('organizer_id')->constrained('users')->cascadeOnDelete();
             $table->string('title');
             $table->text('description')->nullable();
-            $table->dateTime('start_time')->index();
+            $table->dateTime('starts_at')->index();
             $table->string('location');
             $table->unsignedInteger('capacity')->default(0);
             $table->timestamps();

@@ -23,7 +23,7 @@ enum BookingStatus: string
         {
             self::Pending => [self::Confirmed, self::Cancelled, self::Rejected],
             self::Confirmed => [self::Cancelled],
-            self::Cancelled => [],
+            self::Cancelled => [self::Pending , self::Confirmed],
             self::Rejected => [],
         };
     }

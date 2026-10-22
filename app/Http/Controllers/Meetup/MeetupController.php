@@ -7,6 +7,7 @@ use App\Http\Requests\Meetup\StoreMeetupRequest;
 use App\Http\Requests\Meetup\UpdateMeetupRequest;
 use App\Http\Resources\MeetupResource;
 use App\Models\Meetup;
+use App\Models\User;
 use Illuminate\Support\Facades\Gate;
 
 class MeetupController extends Controller
@@ -46,6 +47,11 @@ class MeetupController extends Controller
         $meetup->update($request->validated());
 
         return new MeetupResource($meetup->load('organizer')->loadCount('confirmedBookings'));
+    }
+
+    public function organizerMeetups(User $user){
+        $meetups = $user->organizedMeetups()->where('starts_at' , '>' , now())->withCount('confirmedBookings')->orderBy('starts_at')->paginate(10);
+        return MeetupResource::collection($meetups);
     }
 
     public function destroy(Meetup $meetup)

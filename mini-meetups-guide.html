@@ -1,0 +1,944 @@
+<title>Mini Meetups Study Guide</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Readex+Pro:wght@500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a "learning ticket" hero, then a two-column guide — sticky contents rail on the right (RTL), reading column on the left; one column on phones. */
+:root {
+  --bg: #F3F6F5;
+  --surface: #FFFFFF;
+  --ink: #16201F;
+  --muted: #566664;
+  --line: #DAE2E0;
+  --accent: #0E7C72;
+  --accent-ink: #FFFFFF;
+  --accent-soft: #DFF1EE;
+  --code-bg: #0F1A19;
+  --code-fg: #DCE7E5;
+  --code-dim: #7F9A96;
+  --code-key: #6FD3C5;
+  --pending: #A86A12; --pending-soft: #FBEFD9;
+  --ok: #1D7F47; --ok-soft: #E1F3E8;
+  --bad: #B83A33; --bad-soft: #FAE4E2;
+  --off: #5F6873; --off-soft: #E9ECEF;
+  --font-display: "Readex Pro", "IBM Plex Sans Arabic", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans Arabic", "Segoe UI", Tahoma, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0D1312; --surface: #141C1B; --ink: #E4EDEB; --muted: #94A5A2; --line: #26312F;
+    --accent: #3CC2B3; --accent-ink: #062320; --accent-soft: #12302C;
+    --code-bg: #090F0E; --code-fg: #D6E3E0; --code-dim: #6E8783; --code-key: #6FD3C5;
+    --pending: #E6AE4A; --pending-soft: #33270F;
+    --ok: #52C487; --ok-soft: #0F2E1D;
+    --bad: #EE7D74; --bad-soft: #3A1714;
+    --off: #A0A9B3; --off-soft: #22272C;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0D1312; --surface: #141C1B; --ink: #E4EDEB; --muted: #94A5A2; --line: #26312F;
+  --accent: #3CC2B3; --accent-ink: #062320; --accent-soft: #12302C;
+  --code-bg: #090F0E; --code-fg: #D6E3E0; --code-dim: #6E8783; --code-key: #6FD3C5;
+  --pending: #E6AE4A; --pending-soft: #33270F;
+  --ok: #52C487; --ok-soft: #0F2E1D;
+  --bad: #EE7D74; --bad-soft: #3A1714;
+  --off: #A0A9B3; --off-soft: #22272C;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.85;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 28px 64px;
+}
+a { color: var(--accent); }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+
+.wrap { max-width: 1120px; margin: 0 auto; }
+
+/* ---------- Hero ticket ---------- */
+.ticket {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  overflow: hidden;
+}
+.ticket-main { padding: 28px 30px; min-width: 0; }
+.ticket-stub {
+  position: relative;
+  padding: 28px 26px;
+  border-inline-start: 2px dashed var(--line);
+  display: flex; flex-direction: column; justify-content: center; gap: 10px;
+  min-width: 210px;
+  background: var(--accent-soft);
+}
+.ticket-stub::before, .ticket-stub::after {
+  content: ""; position: absolute; inset-inline-start: -13px;
+  width: 24px; height: 24px; border-radius: 50%;
+  background: var(--bg); border: 1px solid var(--line);
+}
+.ticket-stub::before { top: -13px; }
+.ticket-stub::after { bottom: -13px; }
+.eyebrow {
+  font-family: var(--font-display); font-weight: 600; font-size: 13px;
+  color: var(--accent); letter-spacing: .02em;
+}
+h1 {
+  font-family: var(--font-display); font-weight: 700;
+  font-size: clamp(30px, 5vw, 46px); line-height: 1.2; margin: 6px 0 10px;
+  text-wrap: balance;
+}
+h1 .latin { direction: ltr; unicode-bidi: isolate; }
+.lede { color: var(--muted); max-width: 62ch; margin: 0; }
+.stub-row { display: flex; justify-content: space-between; gap: 16px; font-size: 14px; }
+.stub-row span:first-child { color: var(--muted); }
+.stub-row b { font-family: var(--font-display); font-weight: 600; }
+.progress { display: flex; gap: 4px; margin-top: 4px; direction: rtl; }
+.progress i { flex: 1; height: 6px; border-radius: 3px; background: var(--line); }
+.progress i.done { background: var(--accent); }
+
+/* ---------- Layout ---------- */
+.layout {
+  display: grid;
+  grid-template-columns: 230px minmax(0, 1fr);
+  gap: 40px;
+  margin-top: 36px;
+  align-items: start;
+}
+.toc {
+  position: sticky; top: calc(env(safe-area-inset-top, 0px) + 20px);
+  font-size: 14.5px;
+}
+.toc h2 { font-family: var(--font-display); font-size: 13px; color: var(--muted); font-weight: 600; margin: 0 0 8px; }
+.toc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.toc a {
+  display: block; text-decoration: none; color: var(--ink);
+  padding: 6px 12px; border-radius: 8px; border-inline-start: 2px solid transparent;
+}
+.toc a:hover { background: var(--surface); border-inline-start-color: var(--accent); }
+
+main { min-width: 0; display: grid; gap: 56px; }
+section { min-width: 0; scroll-margin-top: 20px; }
+h2.sec {
+  font-family: var(--font-display); font-weight: 700; font-size: 26px; line-height: 1.35;
+  margin: 0 0 6px; text-wrap: balance;
+}
+.sec-sub { color: var(--muted); margin: 0 0 22px; max-width: 65ch; }
+h3 { font-family: var(--font-display); font-weight: 600; font-size: 19px; margin: 28px 0 10px; }
+p { margin: 0 0 12px; max-width: 70ch; }
+
+code, .mono { font-family: var(--font-mono); font-size: .88em; }
+:not(pre) > code {
+  direction: ltr; unicode-bidi: isolate;
+  background: var(--accent-soft); color: var(--ink);
+  padding: 1px 6px; border-radius: 5px;
+}
+pre {
+  direction: ltr; text-align: left;
+  background: var(--code-bg); color: var(--code-fg);
+  border-radius: 12px; padding: 16px 18px; margin: 12px 0 16px;
+  overflow-x: auto; font-family: var(--font-mono); font-size: 13.5px; line-height: 1.7;
+}
+pre .c { color: var(--code-dim); }
+pre .k { color: var(--code-key); }
+
+.table-wrap { overflow-x: auto; margin: 10px 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+table { width: 100%; border-collapse: collapse; font-size: 15px; }
+th, td { padding: 10px 14px; text-align: start; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-family: var(--font-display); font-weight: 600; font-size: 13.5px; color: var(--muted); background: var(--bg); }
+tr:last-child td { border-bottom: 0; }
+td.center, th.center { text-align: center; }
+
+/* ---------- Pills ---------- */
+.pill {
+  display: inline-block; direction: ltr;
+  font-family: var(--font-mono); font-size: 12.5px; font-weight: 600;
+  padding: 2px 10px; border-radius: 999px; white-space: nowrap;
+}
+.p-pending { color: var(--pending); background: var(--pending-soft); }
+.p-confirmed { color: var(--ok); background: var(--ok-soft); }
+.p-rejected { color: var(--bad); background: var(--bad-soft); }
+.p-cancelled { color: var(--off); background: var(--off-soft); }
+.code-pill { font-family: var(--font-mono); font-weight: 600; direction: ltr; display: inline-block; min-width: 3.2ch; }
+.yes { color: var(--ok); font-weight: 600; }
+.no { color: var(--muted); }
+
+/* ---------- Overview ---------- */
+.roles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin: 8px 0 20px; }
+.role { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px; }
+.role h3 { margin: 0 0 6px; }
+.role p { margin: 0; color: var(--muted); }
+
+.story { list-style: none; padding: 0; margin: 0; display: grid; gap: 0; counter-reset: s; }
+.story li {
+  counter-increment: s; position: relative;
+  padding: 10px 44px 10px 0; border-inline-start: 0;
+}
+.story li::before {
+  content: counter(s); position: absolute; right: 0; top: 10px;
+  width: 28px; height: 28px; border-radius: 50%;
+  display: grid; place-items: center;
+  font-family: var(--font-display); font-size: 13px; font-weight: 600;
+  background: var(--accent); color: var(--accent-ink);
+}
+.story li:not(:last-child)::after {
+  content: ""; position: absolute; right: 13.5px; top: 40px; bottom: -8px; width: 1px; background: var(--line);
+}
+
+/* ---------- Rules ---------- */
+.rules { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.rule-box { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px; min-width: 0; }
+.rule-box h3 { margin-top: 0; }
+.rule-box ul { margin: 0; padding-inline-start: 20px; display: grid; gap: 6px; }
+
+/* ---------- Mermaid ---------- */
+.diagram { direction: ltr; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px; overflow-x: auto; margin: 10px 0 16px; }
+pre.mermaid { background: transparent; color: var(--ink); margin: 0; padding: 0; text-align: center; }
+
+/* ---------- Request layers ---------- */
+.layers { display: grid; gap: 8px; margin: 10px 0; }
+.layer {
+  display: grid; grid-template-columns: 150px minmax(0, 1fr) auto; gap: 14px; align-items: center;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 16px;
+}
+.layer .name { font-family: var(--font-display); font-weight: 600; }
+.layer .q { color: var(--muted); min-width: 0; }
+.layer .code-pill { color: var(--bad); }
+.layer .code-pill.okc { color: var(--ok); }
+
+/* ---------- Files ---------- */
+.files { display: grid; gap: 8px; }
+.file {
+  display: grid; grid-template-columns: minmax(0, 260px) minmax(0, 1fr); gap: 16px;
+  padding: 10px 0; border-bottom: 1px solid var(--line);
+}
+.file:last-child { border-bottom: 0; }
+.file code { background: transparent !important; padding: 0 !important; color: var(--accent) !important; font-weight: 600; overflow-wrap: anywhere; }
+.file span { color: var(--muted); }
+.group-title { font-family: var(--font-display); font-weight: 600; font-size: 14px; color: var(--muted); margin: 18px 0 2px; }
+
+/* ---------- Concepts ---------- */
+.cat { margin-top: 34px; }
+.cat:first-of-type { margin-top: 6px; }
+.cat-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+.cat-head h3 { margin: 0; }
+.cat-head span { color: var(--muted); font-size: 14px; }
+.concepts { display: grid; gap: 14px; }
+.concept { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 20px 22px; min-width: 0; }
+.concept h4 { font-family: var(--font-display); font-weight: 600; font-size: 18px; margin: 0 0 10px; }
+.concept h4 .en { color: var(--muted); font-weight: 500; font-size: 14px; direction: ltr; unicode-bidi: isolate; margin-inline-start: 6px; }
+.pv { display: grid; grid-template-columns: 74px minmax(0, 1fr); gap: 4px 12px; margin: 0 0 6px; }
+.pv dt { font-family: var(--font-display); font-weight: 600; font-size: 13.5px; color: var(--muted); padding-top: 3px; }
+.pv dd { margin: 0; min-width: 0; }
+.golden {
+  margin-top: 12px; padding: 10px 14px; border-radius: 10px;
+  background: var(--accent-soft); font-weight: 500;
+}
+.golden::before { content: "القاعدة: "; font-family: var(--font-display); font-weight: 600; color: var(--accent); }
+
+/* ---------- Golden rules summary ---------- */
+.goldens { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+.goldens li { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 16px; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 12px; align-items: start; }
+.goldens li b { font-family: var(--font-display); color: var(--accent); }
+
+/* ---------- Roadmap ---------- */
+.road { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+.road li { display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 12px; align-items: start; padding: 10px 14px; border-radius: 12px; background: var(--surface); border: 1px solid var(--line); }
+.road .n { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-family: var(--font-display); font-weight: 600; font-size: 13px; border: 1.5px solid var(--line); color: var(--muted); }
+.road li.done .n { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.road li.next { border-color: var(--accent); }
+.road li.next .n { border-color: var(--accent); color: var(--accent); }
+.road b { font-family: var(--font-display); font-weight: 600; }
+.road small { display: block; color: var(--muted); font-size: 14px; }
+.tag { font-size: 12px; font-family: var(--font-display); font-weight: 600; padding: 1px 8px; border-radius: 999px; margin-inline-start: 6px; }
+.tag.d { background: var(--ok-soft); color: var(--ok); }
+.tag.nx { background: var(--accent-soft); color: var(--accent); }
+
+.note { border: 1px solid var(--line); border-inline-start: 3px solid var(--pending); background: var(--surface); padding: 12px 16px; border-radius: 10px; margin: 12px 0; }
+
+footer { margin-top: 60px; color: var(--muted); font-size: 14px; text-align: center; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 900px) {
+  .layout { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  .toc { position: static; }
+  .toc ol { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 6px; }
+  .toc a { white-space: nowrap; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px; }
+  .toc a:hover { border-inline-start-color: var(--line); }
+}
+@media (max-width: 640px) {
+  .ticket { grid-template-columns: minmax(0, 1fr); }
+  .ticket-stub { border-inline-start: 0; border-top: 2px dashed var(--line); min-width: 0; }
+  .ticket-stub::before, .ticket-stub::after { display: none; }
+  .ticket-main { padding: 22px 20px; }
+  .roles, .rules { grid-template-columns: minmax(0, 1fr); }
+  .layer { grid-template-columns: minmax(0, 1fr) auto; }
+  .layer .q { grid-column: 1 / -1; grid-row: 2; }
+  .file { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .pv { grid-template-columns: minmax(0, 1fr); }
+  .concept { padding: 16px 16px; }
+  h2.sec { font-size: 23px; }
+}
+</style>
+
+<div class="wrap" dir="rtl" lang="ar">
+
+  <header class="ticket">
+    <div class="ticket-main">
+      <div class="eyebrow">دليل مذاكرة · Laravel API</div>
+      <h1><span class="latin">Mini Meetups</span></h1>
+      <p class="lede">مشروع تعليمي نبني فيه API لإنشاء meetups وحجز أماكن فيها، بموافقة المنظم وحد أقصى للأماكن. الهدف منه نفهم <b>ليه</b> كل حتة موجودة، قبل ما ندخل على الـ Events والـ Queues والـ Notifications.</p>
+    </div>
+    <aside class="ticket-stub" aria-label="حالة التقدم">
+      <div class="stub-row"><span>خلصنا</span><b>4 من 10</b></div>
+      <div class="progress" aria-hidden="true"><i class="done"></i><i class="done"></i><i class="done"></i><i class="done"></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="stub-row"><span>اللي جاي</span><b>Events &amp; Listeners</b></div>
+      <div class="stub-row"><span>الـ Stack</span><b dir="ltr">Laravel · MySQL</b></div>
+    </aside>
+  </header>
+
+  <div class="layout">
+    <nav class="toc" aria-label="المحتويات">
+      <h2>المحتويات</h2>
+      <ol>
+        <li><a href="#overview">فكرة المشروع</a></li>
+        <li><a href="#rules">قواعد البيزنس</a></li>
+        <li><a href="#lifecycle">دورة حياة الحجز</a></li>
+        <li><a href="#request">رحلة الـ Request</a></li>
+        <li><a href="#files">الملفات ودور كل واحد</a></li>
+        <li><a href="#endpoints">الـ Endpoints</a></li>
+        <li><a href="#concepts">الـ Concepts</a></li>
+        <li><a href="#golden">القواعد الذهبية</a></li>
+        <li><a href="#run">التشغيل والتجربة</a></li>
+        <li><a href="#roadmap">خريطة الطريق</a></li>
+      </ol>
+    </nav>
+
+    <main>
+
+      <!-- ============ Overview ============ -->
+      <section id="overview">
+        <h2 class="sec">فكرة المشروع</h2>
+        <p class="sec-sub">منصة صغيرة شبه لوما: حد بيعمل meetup، والناس بتحجز فيه. أي يوزر ممكن يبقى منظم للـ meetups بتاعته، وحاجز في meetups غيره.</p>
+
+        <div class="roles">
+          <div class="role">
+            <h3>المنظم · Organizer</h3>
+            <p>بيعمل meetup (العنوان، والمكان، والميعاد، وعدد الأماكن)، وبيقرر الحجز يحتاج موافقته ولا يتأكد على طول. ولو محتاج موافقة، هو اللي بيوافق أو يرفض.</p>
+          </div>
+          <div class="role">
+            <h3>الحاجز · Attendee</h3>
+            <p>بيتصفح الـ meetups الجاية ويحجز مكان. يقدر يلغي الحجز، ويرجع يحجز تاني بعدين.</p>
+          </div>
+        </div>
+
+        <h3>مثال لـ flow كامل</h3>
+        <ol class="story">
+          <li><b>هاجر</b> عملت meetup اسمه "Laravel Cairo": 50 مكان، ومحتاج موافقة.</li>
+          <li><b>علي</b> حجز، فحجزه بقى <span class="pill p-pending">pending</span> ومش ماسك مكان لسه.</li>
+          <li>هاجر وافقت، فالحجز بقى <span class="pill p-confirmed">confirmed</span> واتحسب من الـ 50.</li>
+          <li>علي مش هيقدر يروح، فلغى. الحجز بقى <span class="pill p-cancelled">cancelled</span> والمكان فضي.</li>
+          <li>علي غيّر رأيه وحجز تاني. <b>نفس الـ row</b> رجع <span class="pill p-pending">pending</span>، من غير ما نعمل حجز جديد.</li>
+        </ol>
+      </section>
+
+      <!-- ============ Rules ============ -->
+      <section id="rules">
+        <h2 class="sec">قواعد البيزنس</h2>
+        <p class="sec-sub">كل قاعدة هنا ليها مكان في الكود بيطبّقها. لما تحتاجي تعدّلي سلوك، ابدئي من هنا.</p>
+
+        <div class="rules">
+          <div class="rule-box">
+            <h3>الـ Meetups</h3>
+            <ul>
+              <li>المنظم بس يقدر يعدّل أو يحذف الـ meetup.</li>
+              <li>الميعاد لازم يكون في المستقبل (<code>after:now</code>).</li>
+              <li>الـ capacity أقل حاجة 1.</li>
+              <li>مينفعش تنزّلي الـ capacity لأقل من عدد الحجوزات المؤكدة.</li>
+            </ul>
+          </div>
+          <div class="rule-box">
+            <h3>الـ Bookings</h3>
+            <ul>
+              <li>المنظم مينفعش يحجز في الـ meetup بتاعه.</li>
+              <li>مينفعش تحجزي meetup بدأ خلاص.</li>
+              <li>حجز واحد بس لكل يوزر في كل meetup (<code>unique</code>).</li>
+              <li>محتاج موافقة؟ يبقى <span class="pill p-pending">pending</span>. مش محتاج؟ <span class="pill p-confirmed">confirmed</span> على طول.</li>
+              <li><b>المؤكد بس اللي بيتحسب من الـ capacity.</b> فالتشييك بيحصل لحظة ما الحجز يتأكد.</li>
+              <li>الملغي يقدر يتفعّل تاني. المرفوض نهائي.</li>
+            </ul>
+          </div>
+        </div>
+
+        <h3>مين يقدر يعمل إيه؟</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>العملية</th><th>مين مسموحله</th><th>القاعدة متطبقة فين</th></tr></thead>
+            <tbody>
+              <tr><td>تعديل أو حذف meetup</td><td>المنظم</td><td><code>MeetupPolicy</code></td></tr>
+              <tr><td>عرض حجوزات meetup</td><td>المنظم</td><td><code>MeetupPolicy@viewBookings</code></td></tr>
+              <tr><td>موافقة أو رفض</td><td>منظم الـ meetup</td><td><code>BookingPolicy</code></td></tr>
+              <tr><td>إلغاء حجز</td><td>صاحب الحجز</td><td><code>BookingPolicy@cancel</code></td></tr>
+              <tr><td>حجز</td><td>أي حد ماعدا المنظم</td><td><code>BookingService::book()</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ============ Lifecycle ============ -->
+      <section id="lifecycle">
+        <h2 class="sec">دورة حياة الحجز</h2>
+        <p class="sec-sub">ده الـ State Machine. كل سهم هو تحويل مسموح، وأي تحويل مش موجود بيرمي <code>InvalidBookingTransitionException</code> ويرجّع 422.</p>
+
+        <div class="diagram">
+<pre class="mermaid">
+stateDiagram-v2
+    [*] --> pending: book (approval)
+    [*] --> confirmed: book (auto)
+    pending --> confirmed: approve
+    pending --> rejected: reject
+    pending --> cancelled: cancel
+    confirmed --> cancelled: cancel
+    cancelled --> pending: re-book (approval)
+    cancelled --> confirmed: re-book (auto)
+    rejected --> [*]
+</pre>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>من ↓ / إلى ←</th><th class="center"><span class="pill p-pending">pending</span></th><th class="center"><span class="pill p-confirmed">confirmed</span></th><th class="center"><span class="pill p-rejected">rejected</span></th><th class="center"><span class="pill p-cancelled">cancelled</span></th></tr>
+            </thead>
+            <tbody>
+              <tr><td><span class="pill p-pending">pending</span></td><td class="center no">—</td><td class="center yes">✓</td><td class="center yes">✓</td><td class="center yes">✓</td></tr>
+              <tr><td><span class="pill p-confirmed">confirmed</span></td><td class="center no">✗</td><td class="center no">—</td><td class="center no">✗</td><td class="center yes">✓</td></tr>
+              <tr><td><span class="pill p-cancelled">cancelled</span></td><td class="center yes">✓</td><td class="center yes">✓</td><td class="center no">✗</td><td class="center no">—</td></tr>
+              <tr><td><span class="pill p-rejected">rejected</span></td><td class="center no">✗</td><td class="center no">✗</td><td class="center no">✗</td><td class="center no">—</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>ليه الملغي يرجع والمرفوض لأ؟</h3>
+        <p><b>الإلغاء</b> اليوزر عمله بنفسه، فمن حقه يغيّر رأيه. <b>الرفض</b> قرار المنظم. لو سمحنا بالرجوع، اليوزر هيفضل يبعت طلبات للمنظم كل شوية.</p>
+        <p><b>وليه <code>confirmed</code> ميروحش <code>rejected</code>؟</b> المنظم لو قبل حد، مينفعش يرجع يرفضه بعدين. ده قرار بيزنس متطبق في الكود.</p>
+      </section>
+
+      <!-- ============ Request ============ -->
+      <section id="request">
+        <h2 class="sec">رحلة الـ Request</h2>
+        <p class="sec-sub">كل طبقة بتسأل سؤال واحد، ولو الإجابة "لأ" بترجّع status code مختلف. فالـ code لوحده بيقولك المشكلة فين.</p>
+
+        <div class="layers">
+          <div class="layer"><span class="name">Middleware</span><span class="q"><code>auth:sanctum</code>: انت مين؟ · <code>throttle</code>: مش بتبعت كتير؟</span><span class="code-pill">401 · 429</span></div>
+          <div class="layer"><span class="name">Route Binding</span><span class="q"><code>{meetup}</code> يتحول لـ <code>Meetup::findOrFail()</code></span><span class="code-pill">404</span></div>
+          <div class="layer"><span class="name">Form Request</span><span class="q"><code>authorize()</code>: مسموحلك؟ ← بعدها <code>rules()</code>: بياناتك صح؟</span><span class="code-pill">403 · 422</span></div>
+          <div class="layer"><span class="name">Controller</span><span class="q"><code>Gate::authorize()</code> لو مفيش Form Request، وبعدين ينادي الـ Service</span><span class="code-pill">403</span></div>
+          <div class="layer"><span class="name">Service</span><span class="q">قواعد البيزنس، والـ transactions، والـ locks</span><span class="code-pill">422</span></div>
+          <div class="layer"><span class="name">Resource</span><span class="q">يشكّل الـ JSON: اللي مكتوب فيه بس هو اللي يطلع</span><span class="code-pill okc">200</span></div>
+        </div>
+
+        <h3>معنى كل status code عندنا</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>الكود</th><th>معناه في المشروع ده</th></tr></thead>
+            <tbody>
+              <tr><td class="code-pill">200 / 201 / 204</td><td>نجح / اتعمل حاجة جديدة / نجح ومفيش حاجة نرجّعها (زي الـ logout)</td></tr>
+              <tr><td class="code-pill">401</td><td>مفيش token، أو الـ token غلط</td></tr>
+              <tr><td class="code-pill">403</td><td>الـ Policy قالت لأ: الحاجة دي مش بتاعتك</td></tr>
+              <tr><td class="code-pill">404</td><td>الـ id اللي في الـ URL مش موجود</td></tr>
+              <tr><td class="code-pill">422</td><td>validation فشل، أو قاعدة بيزنس اتكسرت (الأماكن خلصت، تحويل مش مسموح…)</td></tr>
+              <tr><td class="code-pill">429</td><td>محاولات login كتير (أكتر من 5 في الدقيقة)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ============ Files ============ -->
+      <section id="files">
+        <h2 class="sec">الملفات ودور كل واحد</h2>
+        <p class="sec-sub">كل ملف ليه مسؤولية واحدة. لما تدوّري على حاجة، اسألي نفسك: "دي شغلانة مين؟"</p>
+
+        <div class="files">
+          <div class="group-title">Models و Enums</div>
+          <div class="file"><code>Models/User.php</code><span><code>organizedMeetups()</code> و<code>bookings()</code>، و<code>HasApiTokens</code> عشان الـ tokens، و<code>Notifiable</code> للـ notifications اللي جاية.</span></div>
+          <div class="file"><code>Models/Meetup.php</code><span><code>organizer()</code> و<code>bookings()</code> و<code>confirmedBookings()</code> و<code>isOrganizedBy()</code>، وcast للتاريخ والـ boolean.</span></div>
+          <div class="file"><code>Models/Booking.php</code><span><code>user()</code> و<code>meetup()</code> و<code>isOwnedBy()</code>، و<code>transitionTo()</code> اللي هي الباب الوحيد لتغيير الـ status.</span></div>
+          <div class="file"><code>Enums/BookingStatus.php</code><span>الحالات، والـ labels، والتحويلات المسموحة.</span></div>
+
+          <div class="group-title">HTTP</div>
+          <div class="file"><code>Requests/Auth/*</code><span>validation التسجيل والدخول.</span></div>
+          <div class="file"><code>Requests/Meetup/*</code><span>validation الـ meetup، و<code>authorize()</code> في التعديل بينادي الـ Policy قبل الـ validation.</span></div>
+          <div class="file"><code>Resources/*Resource.php</code><span>شكل الـ JSON. whitelist، وبيعرض بس اللي الـ controller جهّزه.</span></div>
+          <div class="file"><code>Controllers/Api/AuthController</code><span>register و login و logout و me.</span></div>
+          <div class="file"><code>Controllers/Api/MeetupController</code><span>الـ CRUD، مع pagination و eager loading.</span></div>
+          <div class="file"><code>Controllers/Api/BookingController</code><span>رفيع جدًا: authorize ← ينادي الـ service ← يرجّع resource.</span></div>
+
+          <div class="group-title">Business و Security</div>
+          <div class="file"><code>Services/BookingService.php</code><span>قلب المشروع: <code>book</code> و<code>approve</code> و<code>reject</code> و<code>cancel</code>، بالـ transactions والـ locks.</span></div>
+          <div class="file"><code>Policies/MeetupPolicy.php</code><span><code>update</code> و<code>delete</code> و<code>viewBookings</code>.</span></div>
+          <div class="file"><code>Policies/BookingPolicy.php</code><span><code>cancel</code> و<code>approve</code> و<code>reject</code>.</span></div>
+          <div class="file"><code>Exceptions/BookingException.php</code><span>كل أخطاء الحجز (named constructors)، وبترجّع 422.</span></div>
+          <div class="file"><code>Exceptions/InvalidBookingTransitionException.php</code><span>لما حد يحاول تحويل مش مسموح.</span></div>
+          <div class="file"><code>routes/console.php</code><span>الأمر <code>try:booking</code> اللي بيجرب الـ State Machine من غير tinker.</span></div>
+        </div>
+
+        <h3>الجداول</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>الجدول</th><th>أهم الأعمدة</th><th>ملاحظة</th></tr></thead>
+            <tbody>
+              <tr><td><code>meetups</code></td><td><code>organizer_id</code>، <code>starts_at</code>، <code>capacity</code>، <code>requires_approval</code></td><td><code>starts_at</code> عليه index عشان التذكيرات</td></tr>
+              <tr><td><code>bookings</code></td><td><code>user_id</code>، <code>meetup_id</code>، <code>status</code></td><td><code>unique(user_id, meetup_id)</code>، والـ status من غير default عن قصد</td></tr>
+              <tr><td><code>personal_access_tokens</code></td><td><code>name</code>، <code>token</code></td><td>الـ token متخزن hashed</td></tr>
+              <tr><td><code>jobs</code> و <code>failed_jobs</code></td><td>—</td><td>هنستخدمهم من الخطوة 6</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ============ Endpoints ============ -->
+      <section id="endpoints">
+        <h2 class="sec">الـ Endpoints</h2>
+        <p class="sec-sub">كلها بتبدأ بـ <code>/api</code>. وابعتي في كل request الـ header <code>Accept: application/json</code>.</p>
+
+        <h3>Auth</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Method</th><th>URL</th><th>محتاج token؟</th><th>بيعمل إيه</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">POST</td><td class="mono" dir="ltr">/register</td><td>لأ</td><td>تسجيل (لازم <code>password_confirmation</code>) ويرجّع token</td></tr>
+              <tr><td class="mono">POST</td><td class="mono" dir="ltr">/login</td><td>لأ</td><td>دخول، وعليه حد 5 محاولات في الدقيقة</td></tr>
+              <tr><td class="mono">POST</td><td class="mono" dir="ltr">/logout</td><td>أيوه</td><td>يمسح الـ token الحالي بس</td></tr>
+              <tr><td class="mono">GET</td><td class="mono" dir="ltr">/me</td><td>أيوه</td><td>بيانات اليوزر اللي عامل login</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Meetups</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Method</th><th>URL</th><th>مين</th><th>بيعمل إيه</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">GET</td><td class="mono" dir="ltr">/meetups</td><td>أي يوزر</td><td>الـ meetups الجاية، بـ pagination و <code>spots_left</code></td></tr>
+              <tr><td class="mono">POST</td><td class="mono" dir="ltr">/meetups</td><td>أي يوزر</td><td>إنشاء، واليوزر بيبقى المنظم</td></tr>
+              <tr><td class="mono">GET</td><td class="mono" dir="ltr">/meetups/{meetup}</td><td>أي يوزر</td><td>التفاصيل</td></tr>
+              <tr><td class="mono">PATCH</td><td class="mono" dir="ltr">/meetups/{meetup}</td><td>المنظم</td><td>تعديل جزئي</td></tr>
+              <tr><td class="mono">DELETE</td><td class="mono" dir="ltr">/meetups/{meetup}</td><td>المنظم</td><td>حذف</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Bookings</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Method</th><th>URL</th><th>مين</th><th>بيعمل إيه</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">POST</td><td class="mono" dir="ltr">/meetups/{meetup}/bookings</td><td>أي حد ماعدا المنظم</td><td>حجز، أو إعادة حجز بعد الإلغاء</td></tr>
+              <tr><td class="mono">GET</td><td class="mono" dir="ltr">/meetups/{meetup}/bookings?status=pending</td><td>المنظم</td><td>الحجوزات، مع فلتر اختياري بالـ status</td></tr>
+              <tr><td class="mono">POST</td><td class="mono" dir="ltr">/bookings/{booking}/approve</td><td>المنظم</td><td><span class="pill p-pending">pending</span> ← <span class="pill p-confirmed">confirmed</span> (بيتشيك على الأماكن)</td></tr>
+              <tr><td class="mono">POST</td><td class="mono" dir="ltr">/bookings/{booking}/reject</td><td>المنظم</td><td><span class="pill p-pending">pending</span> ← <span class="pill p-rejected">rejected</span></td></tr>
+              <tr><td class="mono">POST</td><td class="mono" dir="ltr">/bookings/{booking}/cancel</td><td>صاحب الحجز</td><td>← <span class="pill p-cancelled">cancelled</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="note"><b>ليه <code>POST /approve</code> ومش <code>PATCH {"status": "confirmed"}</code>؟</b> لأن كل عملية ليها Policy مختلفة، وقريب هيبقى ليها event مختلف. ولو الـ endpoint قبل أي status، يوزر يقدر يبعت <code>confirmed</code> ويوافق على حجزه بنفسه.</div>
+      </section>
+
+      <!-- ============ Concepts ============ -->
+      <section id="concepts">
+        <h2 class="sec">الـ Concepts اللي استخدمناها</h2>
+        <p class="sec-sub">كل concept مكتوب بنفس الترتيب: المشكلة اللي بيحلها، والحل، والقاعدة اللي تفتكريها.</p>
+
+        <!-- Data -->
+        <div class="cat">
+          <div class="cat-head"><h3>البيانات والـ Models</h3><span>إزاي نخلي الداتابيز والكود يحموا نفسهم</span></div>
+          <div class="concepts">
+
+            <article class="concept">
+              <h4>الـ Enums والـ Casting <span class="en">Backed Enums</span></h4>
+              <dl class="pv">
+                <dt>المشكلة</dt><dd>لو كتبنا <code>'canceled'</code> بـ L واحدة بالغلط، محدش هينبّهنا، وبيانات غلط هتدخل الداتابيز.</dd>
+                <dt>الحل</dt><dd>enum فيه القيم المسموحة في مكان واحد، و cast في الـ model بيحوّل الـ string لـ enum وبالعكس. وأي قيمة غريبة بترمي <code>ValueError</code>.</dd>
+              </dl>
+<pre><span class="k">enum</span> BookingStatus: string {
+    <span class="k">case</span> Pending   = 'pending';
+    <span class="k">case</span> Confirmed = 'confirmed';
+}
+
+<span class="c">// Booking.php</span>
+'status' =&gt; BookingStatus::class,</pre>
+              <div class="golden">الكود يقارن بالـ <code>value</code>، واليوزر يقرا الـ <code>label()</code>.</div>
+            </article>
+
+            <article class="concept">
+              <h4>الـ State Machine</h4>
+              <dl class="pv">
+                <dt>المشكلة</dt><dd>من غير قواعد، أي status ممكن يتحوّل لأي status، فحجز مرفوض ممكن يرجع مؤكد.</dd>
+                <dt>الحل</dt><dd><code>allowedTransitions()</code> في الـ enum بتحدد كل حالة تروح لفين، و<code>transitionTo()</code> في الـ model هي الباب الوحيد اللي الـ status بيتغيّر منه.</dd>
+              </dl>
+<pre><span class="k">public function</span> transitionTo(BookingStatus $to): void
+{
+    <span class="k">if</span> (! $this-&gt;status-&gt;canTransitionTo($to)) {
+        <span class="k">throw new</span> InvalidBookingTransitionException($this-&gt;status, $to);
+    }
+    $this-&gt;update(['status' =&gt; $to]);
+}</pre>
+              <div class="golden">تغيير الـ status يتم بس عن طريق <code>transitionTo()</code>، عمره ما يكون <code>update(['status' =&gt; ...])</code> مباشر.</div>
+            </article>
+
+            <article class="concept">
+              <h4>متضيفيش حاجة مش محتاجاها <span class="en">YAGNI</span></h4>
+              <dl class="pv">
+                <dt>المشكلة</dt><dd>كل status زيادة معناه حالات أكتر في الكود والـ tests. و<code>pending</code> من غير موافقة منظم هيبقى dead state: الحجز يدخله ومحدش يطلّعه.</dd>
+                <dt>الحل</dt><dd>ضفنا <code>pending</code> لما بقى ليه سبب يخرج منه (المنظم يوافق أو يرفض). وماستخدمناش Spatie لأن كل القواعد عندنا ملكية.</dd>
+              </dl>
+              <div class="golden">أي status لازم يبقى ليه سبب يدخله وسبب يخرج منه.</div>
+            </article>
+
+            <article class="concept">
+              <h4>الداتابيز آخر خط دفاع <span class="en">DB Constraints</span></h4>
+              <dl class="pv">
+                <dt>المشكلة</dt><dd>لو جالنا requestين في نفس اللحظة، ممكن الاتنين يعدّوا التشييك اللي في الكود.</dd>
+                <dt>الحل</dt><dd><code>unique(user_id, meetup_id)</code> بيمنع الحجز المكرر، و<code>unsignedInteger</code> بيمنع الـ capacity السالبة، و<code>status</code> من غير default عشان لو نسينا نحدده MySQL يضرب error.</dd>
+              </dl>
+              <div class="golden">خلي الغلط يظهر بصوت عالي. Error واضح أحسن من بيانات غلط بتدخل في صمت.</div>
+            </article>
+
+            <article class="concept">
+              <h4>Status ولا Soft Delete؟</h4>
+              <dl class="pv">
+                <dt>المشكلة</dt><dd>اليوزر لغى ورجع عايز يحجز تاني، والـ <code>unique</code> بيمنعه.</dd>
+                <dt>الحل</dt><dd>الـ soft delete مش بيمسح الـ row، فالـ unique لسه هيمنع. وكمان <code>cancelled</code> بيعبّر عن نفس المعنى. فبنفعّل نفس الـ row تاني عن طريق <code>cancelled → pending/confirmed</code>.</dd>
+              </dl>
+              <div class="golden">حالة البيزنس مكانها الـ status. الـ soft delete للبيانات اللي عايزين نخبيها ونقدر نرجّعها.</div>
+            </article>
+
+            <article class="concept">
+              <h4>الـ Conventions بتفرق</h4>
+              <dl class="pv">
+                <dt>المشكلة</dt><dd>كتبنا <code>start_time</code> في الـ migration و<code>starts_at</code> في الـ model، والقيمة اتجاهلت من غير أي error.</dd>
+                <dt>الحل</dt><dd>أعمدة التاريخ بتنتهي بـ <code>_at</code>. والاسم لازم يبقى واحد في الـ migration والـ fillable والـ casts. و<code>organizer_id</code> محتاج <code>constrained('users')</code> لأنه مش ماشي على شكل <code>{model}_id</code>.</dd>
+              </dl>
+<pre><span class="c">// AppServiceProvider::boot()</span>
+Model::preventSilentlyDiscardingAttributes(! app()-&gt;isProduction());
+Model::preventLazyLoading(! app()-&gt;isProduction());</pre>
+              <div class="golden">وانتي بتطوّري، خلي Laravel يضرب error على أي حاجة بتتجاهل في صمت.</div>
+            </article>
+
+          </div>
+        </div>
+
+        <!-- Security -->
+        <div class="cat">
+          <div class="cat-head"><h3>الأمان والصلاحيات</h3><span>مين انت، ومسموحلك تعمل إيه</span></div>
+          <div class="concepts">
+
+            <article class="concept">
+              <h4>Authentication و Authorization</h4>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>السؤال</th><th>مين بيجاوب</th><th>لو لأ</th></tr></thead>
+                  <tbody>
+                    <tr><td>انت مين؟</td><td><code>auth:sanctum</code></td><td class="code-pill">401</td></tr>
+                    <tr><td>مسموحلك تعمل <b>ده</b> على <b>الحاجة دي</b>؟</td><td>Policy</td><td class="code-pill">403</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="golden">الـ token بيثبت إنك يوزر حقيقي، لكنه مش بيثبت إن الـ meetup ده بتاعك.</div>
+            </article>
+
+            <article class="concept">
+              <h4>ثغرة IDOR <span class="en">Insecure Direct Object Reference</span></h4>
+              <dl class="pv">
+                <dt>المشكلة</dt><dd>يوزر B عامل login، فيبعت <code>PATCH /meetups/5</code> ويعدّل meetup بتاع A. أو يبعت <code>POST /bookings/12/approve</code> ويوافق على حجزه هو.</dd>
+                <dt>الحل</dt><dd>أي endpoint بيلمس حاجة موجودة بالـ id بتاعها، لازم يتشيك على الملكية عن طريق Policy.</dd>
+              </dl>
+              <div class="golden">أي id جاي من اليوزر، اسألي عليه: "هل هو مسموحله يلمس الحاجة دي؟"</div>
+            </article>
+
+            <article class="concept">
+              <h4>الـ Policies</h4>
+              <dl class="pv">
+                <dt>هي إيه</dt><dd>class عادي فيه methods بترجّع <code>true</code> أو <code>false</code>. <b>مش middleware.</b> هي بتجاوب بس، واللي بيمنع هو اللي سألها.</dd>
+                <dt>بتتنده من</dt><dd><code>can:</code> على الـ route، أو <code>authorize()</code> في الـ Form Request، أو <code>Gate::authorize()</code> في الـ controller، أو <code>$user-&gt;can()</code> في أي مكان.</dd>
+              </dl>
+<pre><span class="k">public function</span> update(User $user, Meetup $meetup): bool
+{
+    <span class="k">return</span> $meetup-&gt;isOrganizedBy($user);
+}</pre>
+              <dl class="pv">
+                <dt>ليه منفصلة</dt><dd><code>update</code> و<code>delete</code> نفس الكود النهارده، بس هما قرارين مختلفين ممكن يتغيّروا لوحدهم. والتكرار الحقيقي اتشال في <code>isOrganizedBy()</code>.</dd>
+                <dt>ليه بس 2</dt><dd>الـ index والـ show والـ store مسموحين لأي حد عامل login، فمفيش قاعدة نكتبها. ولو ناديتي ability مش موجودة، الـ default هو الرفض.</dd>
+              </dl>
+              <div class="golden">شيلي التكرار في الـ "إزاي"، وسيبي كل "قرار" لوحده.</div>
+            </article>
+
+            <article class="concept">
+              <h4>Policy و Middleware و Spatie</h4>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>الأداة</th><th>بتسأل</th><th>تعرف الـ object؟</th><th>مثال</th></tr></thead>
+                  <tbody>
+                    <tr><td>Middleware</td><td>عن الـ request كله</td><td class="no">لأ</td><td>عامل login؟ محظور؟</td></tr>
+                    <tr><td>Policy</td><td>عن حاجة معينة</td><td class="yes">أيوه</td><td>الـ meetup ده بتاعك؟</td></tr>
+                    <tr><td>Spatie</td><td>عن دورك (متخزن في الداتابيز)</td><td class="no">لأ</td><td>انت admin؟</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p>Spatie مش بديل للـ Policy، هو بيكمّلها: <code>$user-&gt;hasRole('admin') || $meetup-&gt;isOrganizedBy($user)</code>.</p>
+              <div class="golden">لو السؤال فيه "الحاجة دي بالذات"، يبقى Policy. لو عن الـ request أو اليوزر عمومًا، يبقى Middleware.</div>
+            </article>
+
+            <article class="concept">
+              <h4>الـ Authorization قبل الـ Validation</h4>
+              <dl class="pv">
+                <dt>المشكلة</dt><dd>لو الـ Policy في الـ controller، يوزر B يبعت <code>capacity: 5</code> فياخد 422 "must be at least 30"، ويعرف عدد الحجوزات المؤكدة.</dd>
+                <dt>الحل</dt><dd><code>authorize()</code> في الـ Form Request بتشتغل قبل <code>rules()</code>، فـ B ياخد 403 على طول.</dd>
+              </dl>
+<pre><span class="k">public function</span> authorize(): bool
+{
+    <span class="k">return</span> $this-&gt;user()-&gt;can('update', $this-&gt;route('meetup'));
+}</pre>
+              <div class="note"><code>return true</code> معناها "مسموح للكل". و<code>$this-&gt;route('meetup')</code> بتاخد <b>اسم الـ parameter</b> (<code>{meetup}</code>)، مش اسم الـ route (<code>meetups.update</code>).</div>
+              <div class="golden">مسموحلك؟ الأول. بياناتك صح؟ بعدين.</div>
+            </article>
+
+            <article class="concept">
+              <h4>Sanctum Tokens</h4>
+              <dl class="pv">
+                <dt>إزاي</dt><dd>Login يرجّع token، والـ frontend يبعته في <code>Authorization: Bearer ...</code>. الـ token متخزن hashed، والـ plain text بيظهر مرة واحدة بس.</dd>
+                <dt>الاسم</dt><dd><code>createToken('api')</code>: الـ <code>'api'</code> ده label بس، مفيد عشان تفرّقي بين الأجهزة. والـ logout بيمسح الـ token الحالي بس.</dd>
+                <dt>الـ login</dt><dd>رسالة واحدة للإيميل الغلط والباسورد الغلط، عشان محدش يعرف مين مسجل (User Enumeration). وعليه <code>throttle:5,1</code> ضد الـ Brute Force.</dd>
+              </dl>
+            </article>
+
+          </div>
+        </div>
+
+        <!-- API -->
+        <div class="cat">
+          <div class="cat-head"><h3>تصميم الـ API</h3><span>إيه اللي يدخل، وإيه اللي يطلع</span></div>
+          <div class="concepts">
+
+            <article class="concept">
+              <h4>الـ Form Requests</h4>
+              <dl class="pv">
+                <dt>ليه</dt><dd>الـ controller يركز على الـ logic، والـ validation في مكانها. ولو فشلت، Laravel يرجّع 422 قبل ما يدخل الـ controller.</dd>
+                <dt>مهم</dt><dd><code>$request-&gt;validated()</code> بترجّع اللي عدّى بس، فمحدش يقدر يبعت <code>organizer_id</code> أو <code>is_admin</code>. والـ rules ممكن تبقى dynamic، زي <code>min:{$minCapacity}</code>.</dd>
+              </dl>
+              <div class="golden">أي حاجة تعرفيها من الـ token (زي المنظم)، متاخديهاش من الـ request أبدًا.</div>
+            </article>
+
+            <article class="concept">
+              <h4>Route Model Binding</h4>
+              <dl class="pv">
+                <dt>إزاي</dt><dd><code>/meetups/{meetup}</code> مع <code>Meetup $meetup</code>: Laravel يجيبه لوحده، ولو مش موجود يرجّع 404.</dd>
+                <dt>الفخ</dt><dd><code>User $user</code> على route <b>مفيهوش</b> <code>{user}</code> بيدّيكي <code>new User()</code> فاضي من غير error. استخدمي <code>$request-&gt;user()</code> لليوزر اللي عامل login.</dd>
+              </dl>
+            </article>
+
+            <article class="concept">
+              <h4>الـ API Resources</h4>
+              <dl class="pv">
+                <dt>ليه</dt><dd>whitelist: أي عمود جديد في الداتابيز مش هيطلع إلا لو ضفتيه. وعقد ثابت مع الـ frontend.</dd>
+                <dt>إزاي</dt><dd><code>whenLoaded()</code> و<code>whenCounted()</code> و<code>when()</code> بيطلّعوا الـ key بس لو الـ controller جهّز البيانات. والـ <code>fn () =&gt;</code> معناها lazy evaluation، يعني القيمة متتحسبش غير لو الشرط صح.</dd>
+              </dl>
+<pre>'spots_left' =&gt; $this-&gt;whenCounted('confirmedBookings',
+    fn ($count) =&gt; $this-&gt;capacity - $count),
+'organizer'  =&gt; <span class="k">new</span> UserResource($this-&gt;whenLoaded('organizer')),</pre>
+              <div class="golden">الـ Controller يقرر يجيب إيه، والـ Resource يعرض اللي اتجاب. الـ Resource عمره ما يعمل query.</div>
+            </article>
+
+            <article class="concept">
+              <h4>Endpoint لكل فعل</h4>
+              <dl class="pv">
+                <dt>المشكلة</dt><dd>endpoint واحد <code>PATCH {"status": ...}</code> هيحتاج <code>if</code> كتير، ويسهّل الثغرات.</dd>
+                <dt>الحل</dt><dd><code>approve</code> و<code>reject</code> و<code>cancel</code>، كل واحد بـ Policy وقريب بـ event. وبالـ POST لأننا مش بنمسح الـ row.</dd>
+              </dl>
+              <div class="golden">الـ API بيتكلم بلغة البيزنس ("وافق"، "الغي")، مش بلغة الداتابيز ("غيّر الـ status").</div>
+            </article>
+
+            <article class="concept">
+              <h4>Exceptions مخصوصة</h4>
+              <dl class="pv">
+                <dt>المشكلة</dt><dd><code>Exception</code> عادي بيرجّع 500، وكأن السيرفر وقع. لكن "الأماكن خلصت" مش bug.</dd>
+                <dt>الحل</dt><dd><code>render()</code> بترجّع 422 JSON، فمش محتاجين <code>try/catch</code> في كل controller. والـ named constructors بتجمع كل الرسائل في مكان واحد.</dd>
+              </dl>
+<pre><span class="k">throw</span> BookingException::meetupFull();</pre>
+            </article>
+
+          </div>
+        </div>
+
+        <!-- Performance & architecture -->
+        <div class="cat">
+          <div class="cat-head"><h3>الأداء والـ Architecture</h3><span>الكود يفضل سريع ومتنظم وهو بيكبر</span></div>
+          <div class="concepts">
+
+            <article class="concept">
+              <h4>مشكلة N+1 و Eager Loading</h4>
+              <dl class="pv">
+                <dt>المشكلة</dt><dd>عرض 20 حجز ومع كل واحد اليوزر بتاعه = 21 query.</dd>
+                <dt>الحل</dt><dd><code>with('user')</code> قبل ما البيانات تتجاب، أو <code>load('user')</code> على حاجة اتجابت خلاص، فتبقى 2 queries. و<code>withCount()</code> بتحسب جوه نفس الـ query.</dd>
+              </dl>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th></th><th>بيتكتب على</th><th>امتى</th></tr></thead>
+                  <tbody>
+                    <tr><td><code>with()</code></td><td>الـ query</td><td>قبل ما تجيبي البيانات (index)</td></tr>
+                    <tr><td><code>load()</code></td><td>الـ model</td><td>بعد ما اتجاب (approve)</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p>والـ string (<code>'user'</code>) هو اسم الـ method بتاعة العلاقة في الـ model. و<code>organizedMeetups()</code> بالقوسين = relation تقدري تضيفي عليها شروط، ومن غير قوسين = النتايج نفسها.</p>
+            </article>
+
+            <article class="concept">
+              <h4>الـ Pagination</h4>
+              <dl class="pv">
+                <dt>ليه</dt><dd>أي ليستة ممكن تكبر، مترجعيهاش كلها مرة واحدة أبدًا.</dd>
+                <dt>إزاي</dt><dd><code>paginate(10)</code> + <code>Resource::collection()</code> بيضيفوا <code>links</code> و<code>meta</code> لوحدهم، وLaravel بيقرا <code>?page=</code> من الـ URL.</dd>
+              </dl>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>النوع</th><th>بيعمل <code>COUNT(*)</code>؟</th><th>مناسب لـ</th></tr></thead>
+                  <tbody>
+                    <tr><td><code>paginate()</code></td><td class="yes">أيوه</td><td>أرقام صفحات</td></tr>
+                    <tr><td><code>simplePaginate()</code></td><td class="no">لأ</td><td>التالي والسابق بس</td></tr>
+                    <tr><td><code>cursorPaginate()</code></td><td class="no">لأ</td><td>infinite scroll وجداول ضخمة</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="golden">الليستة اللي ممكن تكبر تستاهل endpoint لوحدها بـ pagination، متتحطش جوه response تاني زي <code>/me</code>.</div>
+            </article>
+
+            <article class="concept">
+              <h4>الـ Service Layer و Dependency Injection</h4>
+              <dl class="pv">
+                <dt>ليه</dt><dd>الـ logic كبير ومتكرر، ومش مربوط بالـ HTTP، فنقدر نناديه من Command أو Job أو Test. وده المكان اللي الـ events هتتطلق منه.</dd>
+                <dt>إزاي</dt><dd>الـ controller بياخده في الـ constructor، والـ Service Container بيعمله لوحده.</dd>
+              </dl>
+<pre><span class="k">public function</span> __construct(<span class="k">private</span> BookingService $bookings) {}</pre>
+              <div class="golden">الـ Controller بيترجم الـ HTTP، والـ Service بيعمل الشغل الحقيقي. و method لكل فعل في البيزنس، حتى لو صغيرة النهارده.</div>
+            </article>
+
+            <article class="concept">
+              <h4>الـ Race Condition و lockForUpdate</h4>
+              <dl class="pv">
+                <dt>المشكلة</dt><dd>فاضل مكان واحد، وسارة وعلي حجزوا في نفس الملّي ثانية. الاتنين قروا "49 من 50"، فالاتنين اتحجزلهم.</dd>
+                <dt>الحل</dt><dd>نقفل الـ meetup جوه transaction، فالحجوزات على نفس الـ meetup تمشي واحد ورا التاني.</dd>
+              </dl>
+<pre>DB::transaction(<span class="k">function</span> () {
+    $meetup = Meetup::whereKey($id)-&gt;lockForUpdate()-&gt;firstOrFail();
+    <span class="c">// SELECT ... FOR UPDATE  →  الباقي يستنى</span>
+    $booking-&gt;refresh();   <span class="c">// أحدث نسخة بعد الانتظار</span>
+    <span class="c">// count  →  create / confirm</span>
+});</pre>
+              <dl class="pv">
+                <dt>لاحظي</dt><dd>الـ lock بيشتغل جوه transaction بس. والعلاقات (<code>$booking-&gt;meetup</code>) مبتعرفش تعمل lock. و<code>refresh()</code> بيحدّث نفس الـ object، أما <code>fresh()</code> فبيرجّع object جديد.</dd>
+              </dl>
+              <div class="golden">أي قرار بيعتمد على حالة في الداتابيز، لازم يتاخد على بيانات اتقرت بعد الـ lock.</div>
+            </article>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ Golden rules ============ -->
+      <section id="golden">
+        <h2 class="sec">القواعد الذهبية</h2>
+        <p class="sec-sub">لو هتفتكري حاجة واحدة من كل concept، افتكري دي.</p>
+        <ul class="goldens">
+          <li><b>01</b><span>خلي الغلط يظهر بصوت عالي. Error واضح أحسن من بيانات غلط في صمت.</span></li>
+          <li><b>02</b><span>أي status لازم يبقى ليه سبب يدخله وسبب يخرج منه.</span></li>
+          <li><b>03</b><span>تغيير الـ status من باب واحد بس: <code>transitionTo()</code>.</span></li>
+          <li><b>04</b><span>الداتابيز آخر خط دفاع، والكود أول خط.</span></li>
+          <li><b>05</b><span>مسموحلك؟ الأول. بياناتك صح؟ بعدين.</span></li>
+          <li><b>06</b><span>أي id جاي من اليوزر: "هل هو مسموحله يلمسه؟"</span></li>
+          <li><b>07</b><span>اللي تعرفيه من الـ token، متاخديهوش من الـ request.</span></li>
+          <li><b>08</b><span>الـ Controller يقرر يجيب إيه، والـ Resource يعرض بس.</span></li>
+          <li><b>09</b><span>أي ليستة ممكن تكبر لازم pagination.</span></li>
+          <li><b>10</b><span>method لكل فعل في البيزنس. شيلي تكرار الـ "إزاي"، وسيبي الـ "قرار" منفصل.</span></li>
+          <li><b>11</b><span>القرار يتاخد على بيانات اتقرت بعد الـ lock.</span></li>
+          <li><b>12</b><span>الكود يقارن بالـ value، واليوزر يقرا الـ label.</span></li>
+        </ul>
+      </section>
+
+      <!-- ============ Run ============ -->
+      <section id="run">
+        <h2 class="sec">التشغيل والتجربة</h2>
+        <p class="sec-sub">خطوات تشغيل المشروع، وأهم السيناريوهات اللي تتأكدي منها في Postman.</p>
+
+<pre>composer install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate
+php artisan serve
+
+php artisan try:booking   <span class="c"># يجرب الـ State Machine</span></pre>
+
+        <div class="note">ابعتي في كل request <code>Accept: application/json</code>. من غيره، الـ validation errors هترجع redirect (302) بدل JSON. وبعد أي تعديل في الـ models، اقفلي tinker وافتحيه تاني، أو اعملي <code>composer dump-autoload</code> لو الـ class مش ظاهر.</div>
+
+        <h3>أهم السيناريوهات</h3>
+        <p>3 يوزرز: <b>A</b> منظم، و<b>B</b> و<b>C</b> حاجزين. و A عامل meetup بـ <code>capacity: 1</code> و<code>requires_approval: true</code>.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>مين</th><th>Request</th><th>المتوقع</th><th>بيختبر إيه</th></tr></thead>
+            <tbody>
+              <tr><td>A</td><td class="mono" dir="ltr">POST /meetups/1/bookings</td><td class="code-pill">422</td><td>المنظم ميحجزش عنده</td></tr>
+              <tr><td>B</td><td class="mono" dir="ltr">PATCH /meetups/1</td><td class="code-pill">403</td><td>IDOR على الـ meetup</td></tr>
+              <tr><td>B</td><td class="mono" dir="ltr">POST /bookings/1/approve</td><td class="code-pill">403</td><td>IDOR: يوافق على نفسه</td></tr>
+              <tr><td>A</td><td>approve لـ B، وبعدين approve لـ C</td><td class="code-pill">422</td><td>الـ capacity وقت الموافقة</td></tr>
+              <tr><td>C</td><td>يحجز تاني بعد ما اترفض</td><td class="code-pill">422</td><td>المرفوض نهائي</td></tr>
+              <tr><td>B</td><td>cancel وبعدين يحجز تاني</td><td class="code-pill">201</td><td>إعادة الحجز على نفس الـ row</td></tr>
+              <tr><td>B</td><td>cancel مرتين</td><td class="code-pill">422</td><td>الـ State Machine</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ============ Roadmap ============ -->
+      <section id="roadmap">
+        <h2 class="sec">خريطة الطريق</h2>
+        <p class="sec-sub">الخطوات بالترتيب. كل خطوة بتبني على اللي قبلها.</p>
+        <ol class="road">
+          <li class="done"><span class="n">1</span><div><b>Setup</b><span class="tag d">خلص</span><small>المشروع، و MySQL، والإيميل بـ SMTP</small></div></li>
+          <li class="done"><span class="n">2</span><div><b>الداتابيز</b><span class="tag d">خلص</span><small>Models، و Migrations، و Enums، و State Machine</small></div></li>
+          <li class="done"><span class="n">3</span><div><b>Auth</b><span class="tag d">خلص</span><small>Sanctum، و Form Requests، و Resources، و Rate Limiting</small></div></li>
+          <li class="done"><span class="n">4</span><div><b>الـ APIs</b><span class="tag d">خلص</span><small>Meetups و Policies، و Bookings و Service و lockForUpdate</small></div></li>
+          <li class="next"><span class="n">5</span><div><b>Events &amp; Listeners</b><span class="tag nx">اللي جاي</span><small><code>BookingRequested</code>، و<code>BookingConfirmed</code>، و<code>BookingRejected</code>، و<code>BookingCancelled</code>، و<code>MeetupDeleted</code></small></div></li>
+          <li><span class="n">6</span><div><b>Queues</b><small>الـ listeners تشتغل في الخلفية: <code>ShouldQueue</code> و الـ worker</small></div></li>
+          <li><span class="n">7</span><div><b>Notifications</b><small>تتخزن في الداتابيز وتتبعت بالإيميل</small></div></li>
+          <li><span class="n">8</span><div><b>Delayed Jobs و Scheduler</b><small>تذكير قبل الـ meetup بساعة</small></div></li>
+          <li><span class="n">9</span><div><b>Retries و Failed Jobs</b><small>نتعامل مع الفشل: المحاولات، والانتظار بينها، والـ jobs اللي فشلت</small></div></li>
+          <li><span class="n">10</span><div><b>Real-time</b><small>Bonus: notifications لحظية بـ Laravel Reverb</small></div></li>
+        </ol>
+
+        <h3>تحسينات مؤجلة</h3>
+        <ul>
+          <li>نعمل lock على الـ booking نفسه (مش بس <code>refresh()</code>) في <code>approve</code> و<code>cancel</code>، عشان نقفل الثغرة الصغيرة بينهم تمامًا.</li>
+          <li>نحوّل <code>try:booking</code> لـ Feature Tests حقيقية.</li>
+          <li>نضيف تاريخ انتهاء للـ tokens.</li>
+        </ul>
+      </section>
+
+    </main>
+  </div>
+
+  <footer>Mini Meetups · دليل مذاكرة للخطوات من 1 لـ 4</footer>
+</div>

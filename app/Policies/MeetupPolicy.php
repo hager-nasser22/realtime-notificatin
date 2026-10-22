@@ -22,4 +22,9 @@ class MeetupPolicy
         return $meetup->organizedBy($user);
     }
 
+    public function viewBookings(User $user, Meetup $meetup) : bool
+    {
+        return $meetup->organizedBy($user);
+    }
+
 }

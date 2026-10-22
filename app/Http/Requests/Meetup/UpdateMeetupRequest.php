@@ -7,12 +7,17 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateMeetupRequest extends FormRequest
 {
+
+    public function meetup()
+    {
+        return $this->route('meetup');
+    }
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return true;
+        return $this->user()->can('update' , $this->meetup());
     }
 
     /**
@@ -22,8 +27,7 @@ class UpdateMeetupRequest extends FormRequest
      */
     public function rules(): array
     {
-        $meetup = $this->route('meetup');
-        $capacity = max(1, $meetup->confirmedBookings()->count());
+        $capacity = max(1, $this->meetup()->confirmedBookings()->count());
         return [
             'title'             => ['sometimes', 'string', 'max:255'],
             'description'       => ['sometimes', 'nullable', 'string'],

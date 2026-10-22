@@ -43,8 +43,6 @@ class MeetupController extends Controller
 
     public function update(UpdateMeetupRequest $request, Meetup $meetup)
     {
-        Gate::authorize('update', $meetup);
-
         $meetup->update($request->validated());
 
         return new MeetupResource($meetup->load('organizer')->loadCount('confirmedBookings'));

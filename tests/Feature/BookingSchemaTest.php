@@ -39,7 +39,7 @@ class BookingSchemaTest extends TestCase
 
     public function test_disallowed_transition_leaves_the_status_unchanged(): void
     {
-        $booking = Booking::factory()->create(['status' => BookingStatus::Cancelled]);
+        $booking = Booking::factory()->create(['status' => BookingStatus::Rejected]);
 
         try {
             $booking->transitionTo(BookingStatus::Confirmed);
@@ -47,7 +47,17 @@ class BookingSchemaTest extends TestCase
         } catch (InvalidTransitionsBookingException) {
         }
 
-        $this->assertDatabaseHas('bookings', ['id' => $booking->id, 'status' => 'cancelled']);
+        $this->assertDatabaseHas('bookings', ['id' => $booking->id, 'status' => 'rejected']);
+    }
+
+    public function test_cancelled_booking_can_be_rebooked_on_the_same_row(): void
+    {
+        $booking = Booking::factory()->create(['status' => BookingStatus::Cancelled]);
+
+        $booking->transitionTo(BookingStatus::Pending);
+
+        $this->assertDatabaseHas('bookings', ['id' => $booking->id, 'status' => 'pending']);
+        $this->assertDatabaseCount('bookings', 1);
     }
 
     public function test_confirmed_bookings_only_returns_confirmed(): void

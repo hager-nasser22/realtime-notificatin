@@ -49,6 +49,32 @@ class BookingService
         });
     }
 
+    public function approve(Booking $booking): Booking
+    {
+        return DB::transaction(function () use ($booking) {
+            $meetup = Meetup::whereKey($booking->meetup_id)->lockForUpdate()->firstOrFail();
+            $booking->refresh();
+            $this->ensureHasSpace($meetup);
+            $booking->transitionTo(BookingStatus::Confirmed);
+
+            return $booking;
+        });
+    }
+
+    public function reject(Booking $booking): Booking
+    {
+        $booking->transitionTo(BookingStatus::Rejected);
+
+        return $booking;
+    }
+
+    public function cancel(Booking $booking): Booking
+    {
+        $booking->transitionTo(BookingStatus::Cancelled);
+
+        return $booking;
+    }
+
     public function ensureHasSpace(Meetup $meetup): void
     {
         if ($meetup->confirmedBookings()->count() >= $meetup->capacity) {

@@ -20,6 +20,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/meetups/{meetup}/bookings', [BookingController::class, 'index']);
     Route::post('/meetups/{meetup}/bookings', [BookingController::class, 'store']);
 
+    Route::post('/bookings/{booking}/cancel', [BookingController::class, 'cancel']);
+    Route::post('/bookings/{booking}/approve', [BookingController::class, 'approve']);
+    Route::post('/bookings/{booking}/reject', [BookingController::class, 'reject']);
+
     Route::get('/me', [AuthController::class, 'me']);
     Route::post('/logout', [AuthController::class, 'logout']);
 });

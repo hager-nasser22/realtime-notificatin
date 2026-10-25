@@ -37,4 +37,9 @@ class Booking extends Model
         }
         $this->update(['status' => $newStatus]);
     }
+
+    public function isOwner(User $user): bool
+    {
+        return $this->user_id === $user->id;
+    }
 }

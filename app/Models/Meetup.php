@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\BookingStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -24,6 +25,16 @@ class Meetup extends Model
     public function organizer()
     {
         return $this->belongsTo(User::class, 'organizer_id');
+    }
+
+    public function bookings()
+    {
+        return $this->hasMany(Booking::class);
+    }
+
+    public function confirmedBookings()
+    {
+        return $this->hasMany(Booking::class)->where('status', BookingStatus::Confirmed);
     }
 
     public function organizedBy(User $user): bool

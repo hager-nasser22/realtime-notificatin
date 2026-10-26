@@ -18,8 +18,9 @@ class BookingStatusTest extends TestCase
             'confirmed to cancelled' => [BookingStatus::Confirmed, BookingStatus::Cancelled, true],
             'confirmed to pending' => [BookingStatus::Confirmed, BookingStatus::Pending, false],
             'confirmed to rejected' => [BookingStatus::Confirmed, BookingStatus::Rejected, false],
-            'cancelled to pending' => [BookingStatus::Cancelled, BookingStatus::Pending, false],
-            'cancelled to confirmed' => [BookingStatus::Cancelled, BookingStatus::Confirmed, false],
+            'cancelled to pending' => [BookingStatus::Cancelled, BookingStatus::Pending, true],
+            'cancelled to confirmed' => [BookingStatus::Cancelled, BookingStatus::Confirmed, true],
+            'cancelled to rejected' => [BookingStatus::Cancelled, BookingStatus::Rejected, false],
             'rejected to confirmed' => [BookingStatus::Rejected, BookingStatus::Confirmed, false],
             'rejected to pending' => [BookingStatus::Rejected, BookingStatus::Pending, false],
         ];

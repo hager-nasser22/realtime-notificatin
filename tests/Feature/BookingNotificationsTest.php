@@ -6,35 +6,21 @@ use App\Enums\BookingStatus;
 use App\Models\Booking;
 use App\Models\Meetup;
 use App\Models\User;
+use App\Notifications\BookingConfirmedNotification;
+use App\Notifications\BookingRejectedNotification;
+use App\Notifications\NewBookingRequestNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Notification;
 use Laravel\Sanctum\Sanctum;
-use Symfony\Component\Mime\Email;
 use Tests\TestCase;
 
 class BookingNotificationsTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @return array<int, Email> */
-    private function sentEmails(): array
+    public function test_organizer_is_notified_about_a_new_request(): void
     {
-        return collect(app('mailer')->getSymfonyTransport()->messages())
-            ->map(fn ($sent) => $sent->getOriginalMessage())
-            ->all();
-    }
-
-    private function assertSentTo(string $email, string $subject, string $bodyContains): void
-    {
-        $match = collect($this->sentEmails())->first(
-            fn (Email $mail) => $mail->getTo()[0]->getAddress() === $email && $mail->getSubject() === $subject
-        );
-
-        $this->assertNotNull($match, "No '{$subject}' email sent to {$email}.");
-        $this->assertStringContainsString($bodyContains, $match->getTextBody());
-    }
-
-    public function test_organizer_is_emailed_about_a_new_request(): void
-    {
+        Notification::fake();
         $user = User::factory()->create(['name' => 'Hager']);
         $meetup = Meetup::factory()->create(['requires_approval' => true, 'title' => 'Laravel Cairo']);
         Sanctum::actingAs($user);
@@ -42,32 +28,37 @@ class BookingNotificationsTest extends TestCase
         $this->postJson("/api/meetups/{$meetup->id}/bookings")->assertCreated();
 
         $this->assertDatabaseHas('bookings', ['user_id' => $user->id, 'status' => 'pending']);
-        $this->assertSentTo($meetup->organizer->email, 'New booking request', 'Hager wants to join "Laravel Cairo"');
+        Notification::assertSentTo($meetup->organizer, NewBookingRequestNotification::class, function ($n, array $channels) use ($meetup) {
+            return $channels === ['mail', 'database']
+                && $n->toArray($meetup->organizer)['message'] === 'Hager wants to join "Laravel Cairo".';
+        });
     }
 
-    public function test_attendee_is_emailed_when_confirmed(): void
+    public function test_attendee_is_notified_when_confirmed(): void
     {
+        Notification::fake();
         $booking = Booking::factory()->create(['status' => BookingStatus::Pending]);
         Sanctum::actingAs($booking->meetup->organizer);
 
         $this->postJson("/api/bookings/{$booking->id}/approve")->assertOk();
 
         $this->assertDatabaseHas('bookings', ['id' => $booking->id, 'status' => 'confirmed']);
-        $this->assertSentTo($booking->user->email, 'Booking confirmed', "Your seat at \"{$booking->meetup->title}\" is confirmed");
+        Notification::assertSentTo($booking->user, BookingConfirmedNotification::class, fn ($n) => $n->booking->is($booking));
     }
 
-    public function test_attendee_is_emailed_when_rejected(): void
+    public function test_attendee_is_notified_when_rejected(): void
     {
+        Notification::fake();
         $booking = Booking::factory()->create(['status' => BookingStatus::Pending]);
         Sanctum::actingAs($booking->meetup->organizer);
 
         $this->postJson("/api/bookings/{$booking->id}/reject")->assertOk();
 
         $this->assertDatabaseHas('bookings', ['id' => $booking->id, 'status' => 'rejected']);
-        $this->assertSentTo($booking->user->email, 'Booking request declined', 'was not accepted');
+        Notification::assertSentTo($booking->user, BookingRejectedNotification::class, fn ($n) => $n->booking->is($booking));
     }
 
-    public function test_organizer_is_emailed_when_a_booking_is_cancelled(): void
+    public function test_organizer_gets_a_database_notification_when_a_booking_is_cancelled(): void
     {
         $booking = Booking::factory()->create(['status' => BookingStatus::Confirmed]);
         Sanctum::actingAs($booking->user);
@@ -75,20 +66,38 @@ class BookingNotificationsTest extends TestCase
         $this->postJson("/api/bookings/{$booking->id}/cancel")->assertOk();
 
         $this->assertDatabaseHas('bookings', ['id' => $booking->id, 'status' => 'cancelled']);
-        $this->assertSentTo(
-            $booking->meetup->organizer->email,
-            'Booking cancelled',
-            "{$booking->user->name} cancelled their booking for \"{$booking->meetup->title}\""
+        $notification = $booking->meetup->organizer->notifications()->sole();
+        $this->assertSame('booking.cancelled', $notification->type);
+        $this->assertSame(
+            "{$booking->user->name} cancelled their booking for \"{$booking->meetup->title}\".",
+            $notification->data['message']
         );
     }
 
-    public function test_failed_booking_sends_no_email(): void
+    public function test_confirmation_is_stored_and_emailed(): void
     {
+        $booking = Booking::factory()->create(['status' => BookingStatus::Pending]);
+        Sanctum::actingAs($booking->meetup->organizer);
+
+        $this->postJson("/api/bookings/{$booking->id}/approve")->assertOk();
+
+        $notification = $booking->user->notifications()->sole();
+        $this->assertSame('booking.confirmed', $notification->type);
+        $this->assertSame($booking->id, $notification->data['booking_id']);
+
+        $subjects = collect(app('mailer')->getSymfonyTransport()->messages())
+            ->map(fn ($sent) => $sent->getOriginalMessage()->getSubject());
+        $this->assertContains("You're in: {$booking->meetup->title}", $subjects);
+    }
+
+    public function test_failed_booking_sends_no_notification(): void
+    {
+        Notification::fake();
         $meetup = Meetup::factory()->create();
         Sanctum::actingAs($meetup->organizer);
 
         $this->postJson("/api/meetups/{$meetup->id}/bookings")->assertUnprocessable();
 
-        $this->assertSame([], $this->sentEmails());
+        Notification::assertNothingSent();
     }
 }

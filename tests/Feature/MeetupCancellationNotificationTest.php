@@ -5,17 +5,17 @@ namespace Tests\Feature;
 use App\Enums\BookingStatus;
 use App\Events\BookingConfirmed;
 use App\Events\MeetupCancelled;
-use App\Listeners\NotifyAttendeeOfConfirmation;
-use App\Listeners\NotifyAttendeesOfMeetupCancellation;
 use App\Models\Booking;
 use App\Models\Meetup;
 use App\Models\User;
-use Illuminate\Events\CallQueuedListener;
+use App\Notifications\BookingConfirmedNotification;
+use App\Notifications\MeetupCancelledNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Notifications\SendQueuedNotifications;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Queue;
 use Laravel\Sanctum\Sanctum;
-use Symfony\Component\Mime\Email;
 use Tests\TestCase;
 
 class MeetupCancellationNotificationTest extends TestCase
@@ -47,23 +47,38 @@ class MeetupCancellationNotificationTest extends TestCase
             && collect($e->attendeeIds)->sort()->values()->all() === collect([$confirmed->user_id, $pending->user_id])->sort()->values()->all());
     }
 
-    public function test_active_attendees_are_emailed_and_cancelled_ones_are_not(): void
+    public function test_active_attendees_are_notified_and_cancelled_ones_are_not(): void
     {
+        Notification::fake();
         [$meetup, $confirmed, $pending, $cancelled] = $this->meetupWithBookings();
         Sanctum::actingAs($meetup->organizer);
 
         $this->deleteJson("/api/meetups/{$meetup->id}")->assertOk();
 
-        $recipients = collect(app('mailer')->getSymfonyTransport()->messages())
-            ->map(fn ($sent) => $sent->getOriginalMessage())
-            ->filter(fn (Email $mail) => $mail->getSubject() === 'Meetup cancelled')
-            ->map(fn (Email $mail) => $mail->getTo()[0]->getAddress());
+        foreach ([$confirmed, $pending] as $booking) {
+            Notification::assertSentTo(
+                User::find($booking->user_id),
+                MeetupCancelledNotification::class,
+                fn ($n, array $channels) => $n->title === 'Laravel Cairo' && $channels === ['mail', 'database']
+            );
+        }
+        Notification::assertNotSentTo(User::find($cancelled->user_id), MeetupCancelledNotification::class);
+    }
 
-        $this->assertEqualsCanonicalizing(
-            [User::find($confirmed->user_id)->email, User::find($pending->user_id)->email],
-            $recipients->values()->all()
-        );
-        $this->assertNotContains(User::find($cancelled->user_id)->email, $recipients);
+    public function test_attendee_gets_a_stored_cancellation_notification(): void
+    {
+        [$meetup, $confirmed] = $this->meetupWithBookings();
+        Sanctum::actingAs($meetup->organizer);
+
+        $this->deleteJson("/api/meetups/{$meetup->id}")->assertOk();
+
+        $this->assertDatabaseHas('notifications', [
+            'notifiable_id' => $confirmed->user_id,
+            'type' => 'meetup.cancelled',
+        ]);
+        $subjects = collect(app('mailer')->getSymfonyTransport()->messages())
+            ->map(fn ($sent) => $sent->getOriginalMessage()->getSubject());
+        $this->assertContains('Cancelled: Laravel Cairo', $subjects);
     }
 
     public function test_other_user_cannot_cancel_and_nothing_is_dispatched(): void
@@ -78,7 +93,7 @@ class MeetupCancellationNotificationTest extends TestCase
         Event::assertNotDispatched(MeetupCancelled::class);
     }
 
-    public function test_email_listeners_are_pushed_to_the_queue(): void
+    public function test_notifications_are_pushed_to_the_queue(): void
     {
         Queue::fake();
         [$meetup] = $this->meetupWithBookings();
@@ -87,7 +102,7 @@ class MeetupCancellationNotificationTest extends TestCase
         $this->deleteJson("/api/meetups/{$meetup->id}")->assertOk();
         BookingConfirmed::dispatch(Booking::factory()->create());
 
-        Queue::assertPushed(CallQueuedListener::class, fn ($job) => $job->class === NotifyAttendeesOfMeetupCancellation::class);
-        Queue::assertPushed(CallQueuedListener::class, fn ($job) => $job->class === NotifyAttendeeOfConfirmation::class);
+        Queue::assertPushed(SendQueuedNotifications::class, fn ($job) => $job->notification instanceof MeetupCancelledNotification);
+        Queue::assertPushed(SendQueuedNotifications::class, fn ($job) => $job->notification instanceof BookingConfirmedNotification);
     }
 }

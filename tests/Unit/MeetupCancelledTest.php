@@ -3,11 +3,10 @@
 namespace Tests\Unit;
 
 use App\Events\MeetupCancelled;
-use App\Listeners\NotifyAttendeeOfConfirmation;
-use App\Listeners\NotifyAttendeeOfRejection;
-use App\Listeners\NotifyAttendeesOfMeetupCancellation;
-use App\Listeners\NotifyOrganizerOfBookingRequest;
-use App\Listeners\NotifyOrganizerOfCancellation;
+use App\Notifications\BookingConfirmedNotification;
+use App\Notifications\BookingRejectedNotification;
+use App\Notifications\MeetupCancelledNotification;
+use App\Notifications\NewBookingRequestNotification;
 use Carbon\CarbonImmutable;
 use Illuminate\Contracts\Events\ShouldDispatchAfterCommit;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -28,20 +27,19 @@ class MeetupCancelledTest extends TestCase
         $this->assertInstanceOf(ShouldDispatchAfterCommit::class, $event);
     }
 
-    public static function emailListeners(): array
+    public static function mailNotifications(): array
     {
         return [
-            [NotifyAttendeeOfConfirmation::class],
-            [NotifyAttendeeOfRejection::class],
-            [NotifyOrganizerOfBookingRequest::class],
-            [NotifyOrganizerOfCancellation::class],
-            [NotifyAttendeesOfMeetupCancellation::class],
+            [NewBookingRequestNotification::class],
+            [BookingConfirmedNotification::class],
+            [BookingRejectedNotification::class],
+            [MeetupCancelledNotification::class],
         ];
     }
 
-    #[DataProvider('emailListeners')]
-    public function test_email_listeners_are_queued(string $listener): void
+    #[DataProvider('mailNotifications')]
+    public function test_notifications_that_send_email_are_queued(string $notification): void
     {
-        $this->assertContains(ShouldQueue::class, class_implements($listener));
+        $this->assertContains(ShouldQueue::class, class_implements($notification));
     }
 }

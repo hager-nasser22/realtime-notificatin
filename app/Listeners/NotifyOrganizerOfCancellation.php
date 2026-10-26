@@ -3,6 +3,8 @@
 namespace App\Listeners;
 
 use App\Events\BookingCancelled;
+use App\Notifications\BookingCancelledNotification;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Mail;
 
 class NotifyOrganizerOfCancellation
@@ -11,10 +13,6 @@ class NotifyOrganizerOfCancellation
     {
         $booking = $event->booking;
         $meetup = $booking->meetup;
-
-        Mail::raw(
-            "{$booking->user->name} cancelled their booking for \"{$meetup->title}\".",
-            fn ($message) => $message->to($meetup->organizer->email)->subject('Booking cancelled')
-        );
+        $meetup->organizer->notify(new BookingCancelledNotification($booking));
     }
 }

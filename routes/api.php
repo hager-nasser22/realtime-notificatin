@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BookingController;
+use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Meetup\MeetupController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -23,6 +24,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/bookings/{booking}/cancel', [BookingController::class, 'cancel']);
     Route::post('/bookings/{booking}/approve', [BookingController::class, 'approve']);
     Route::post('/bookings/{booking}/reject', [BookingController::class, 'reject']);
+
+    Route::get('/me/notifications', [NotificationController::class, 'index']);
+    Route::get('/me/notifications/unread-count', [NotificationController::class, 'unreadCount']);
+    Route::post('/me/notifications/read-all', [NotificationController::class, 'markAllAsRead']);
+    Route::post('/me/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
 
     Route::get('/me', [AuthController::class, 'me']);
     Route::post('/logout', [AuthController::class, 'logout']);

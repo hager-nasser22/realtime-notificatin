@@ -3,6 +3,7 @@
 namespace App\Listeners;
 
 use App\Events\BookingRequested;
+use App\Notifications\NewBookingRequestNotification;
 use Illuminate\Support\Facades\Mail;
 
 class NotifyOrganizerOfBookingRequest
@@ -11,10 +12,6 @@ class NotifyOrganizerOfBookingRequest
     {
         $booking = $event->booking;
         $meetup = $booking->meetup;
-
-        Mail::raw(
-            "{$booking->user->name} wants to join \"{$meetup->title}\". Review the request in your dashboard.",
-            fn ($message) => $message->to($meetup->organizer->email)->subject('New booking request')
-        );
+        $meetup->organizer->notify(new NewBookingRequestNotification($booking));
     }
 }

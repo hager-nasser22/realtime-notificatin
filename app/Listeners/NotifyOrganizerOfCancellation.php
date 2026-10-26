@@ -3,9 +3,10 @@
 namespace App\Listeners;
 
 use App\Events\BookingCancelled;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Mail;
 
-class NotifyOrganizerOfCancellation
+class NotifyOrganizerOfCancellation implements ShouldQueue
 {
     public function handle(BookingCancelled $event): void
     {

@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers\Meetup;
 
+use App\Enums\BookingStatus;
+use App\Events\MeetupCancelled;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Meetup\StoreMeetupRequest;
 use App\Http\Requests\Meetup\UpdateMeetupRequest;
 use App\Http\Resources\MeetupResource;
 use App\Models\Meetup;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 
 class MeetupController extends Controller
@@ -64,7 +67,16 @@ class MeetupController extends Controller
     {
         Gate::authorize('delete', $meetup);
 
-        $meetup->delete();
+        DB::transaction(function () use ($meetup) {
+            $attendeeIds = $meetup->bookings()
+                ->whereIn('status', [BookingStatus::Pending, BookingStatus::Confirmed])
+                ->pluck('user_id')
+                ->all();
+
+            $meetup->delete();
+
+            MeetupCancelled::dispatch($meetup->title, $meetup->starts_at, $attendeeIds);
+        });
 
         return response()->json([
             'message' => 'Meetup deleted successfully',

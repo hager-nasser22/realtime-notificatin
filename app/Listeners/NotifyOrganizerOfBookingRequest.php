@@ -3,9 +3,10 @@
 namespace App\Listeners;
 
 use App\Events\BookingRequested;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Mail;
 
-class NotifyOrganizerOfBookingRequest
+class NotifyOrganizerOfBookingRequest implements ShouldQueue
 {
     public function handle(BookingRequested $event): void
     {

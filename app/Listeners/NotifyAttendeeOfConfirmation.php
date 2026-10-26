@@ -3,19 +3,12 @@
 namespace App\Listeners;
 
 use App\Events\BookingConfirmed;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Support\Facades\Mail;
+use App\Notifications\BookingConfirmedNotification;
 
-class NotifyAttendeeOfConfirmation implements ShouldQueue
+class NotifyAttendeeOfConfirmation
 {
     public function handle(BookingConfirmed $event): void
     {
-        $booking = $event->booking;
-        $meetup = $booking->meetup;
-
-        Mail::raw(
-            "Your seat at \"{$meetup->title}\" is confirmed. See you on {$meetup->starts_at->format('D, M j \a\t H:i')}!",
-            fn ($message) => $message->to($booking->user->email)->subject('Booking confirmed')
-        );
+        $event->booking->user->notify(new BookingConfirmedNotification($event->booking));
     }
 }

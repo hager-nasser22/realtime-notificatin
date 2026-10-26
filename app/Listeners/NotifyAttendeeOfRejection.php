@@ -3,18 +3,12 @@
 namespace App\Listeners;
 
 use App\Events\BookingRejected;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Support\Facades\Mail;
+use App\Notifications\BookingRejectedNotification;
 
-class NotifyAttendeeOfRejection implements ShouldQueue
+class NotifyAttendeeOfRejection
 {
     public function handle(BookingRejected $event): void
     {
-        $booking = $event->booking;
-
-        Mail::raw(
-            "Sorry, your request to join \"{$booking->meetup->title}\" was not accepted.",
-            fn ($message) => $message->to($booking->user->email)->subject('Booking request declined')
-        );
+        $event->booking->user->notify(new BookingRejectedNotification($event->booking));
     }
 }

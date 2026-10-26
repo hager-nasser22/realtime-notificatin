@@ -4,18 +4,15 @@ namespace App\Listeners;
 
 use App\Events\MeetupCancelled;
 use App\Models\User;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Support\Facades\Mail;
+use App\Notifications\MeetupCancelledNotification;
+use Illuminate\Support\Facades\Notification;
 
-class NotifyAttendeesOfMeetupCancellation implements ShouldQueue
+class NotifyAttendeesOfMeetupCancellation
 {
     public function handle(MeetupCancelled $event): void
     {
-        User::whereIn('id', $event->attendeeIds)->each(function (User $user) use ($event) {
-            Mail::raw(
-                "Unfortunately, \"{$event->title}\" scheduled for {$event->startsAt->format('D, M j \a\t H:i')} has been cancelled.",
-                fn ($message) => $message->to($user->email)->subject('Meetup cancelled')
-            );
-        });
+        $attendees = User::whereIn('id', $event->attendeeIds)->get();
+
+        Notification::send($attendees, new MeetupCancelledNotification($event->title, $event->startsAt));
     }
 }

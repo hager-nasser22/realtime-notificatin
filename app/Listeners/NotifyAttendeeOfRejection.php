@@ -3,9 +3,10 @@
 namespace App\Listeners;
 
 use App\Events\BookingRejected;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Mail;
 
-class NotifyAttendeeOfRejection
+class NotifyAttendeeOfRejection implements ShouldQueue
 {
     public function handle(BookingRejected $event): void
     {

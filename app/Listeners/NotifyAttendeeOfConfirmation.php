@@ -3,9 +3,10 @@
 namespace App\Listeners;
 
 use App\Events\BookingConfirmed;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Mail;
 
-class NotifyAttendeeOfConfirmation
+class NotifyAttendeeOfConfirmation implements ShouldQueue
 {
     public function handle(BookingConfirmed $event): void
     {
